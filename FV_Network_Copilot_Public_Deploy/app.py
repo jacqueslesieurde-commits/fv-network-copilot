@@ -120,7 +120,7 @@ INDUSTRY_FAMILIES = {
         "Consumer", "Retail", "Luxury"
     },
     "defense": {
-        "Defense", "Cybersecurity", "Industrial Technology"
+        "Defense", "Cybersecurity"
     },
 }
 
@@ -221,6 +221,16 @@ def fallback_extract(request):
     else:
         objective = "Resolve the founder's priority bottleneck"
 
+    if not industries and any(
+        signal in t
+        for signal in [
+            "industrial customer", "industrial customers",
+            "industrial client", "industrial clients",
+            "factory", "factories", "manufacturer", "manufacturers"
+        ]
+    ):
+        industries = ["Industrial Technology"]
+
     analysis = {
         "objective": objective,
         "countries": countries,
@@ -292,6 +302,13 @@ Retail
 Logistics
 Defense
 
+Industry interpretation rule:
+- "industries" should capture the relevant operating or target-customer sector for network matching.
+- If the founder explicitly says "industrial customers", "industrial clients", factories, manufacturers,
+  industrial groups or similar wording, do NOT leave industries empty.
+- In that case use "Industrial Technology" unless a more specific label such as Manufacturing,
+  Automotive, Energy, Robotics or Logistics is directly supported by the request.
+
 Rules:
 - Use only information supported by the founder request.
 - You may infer a direct business implication, but make uncertainty explicit in assumptions.
@@ -314,6 +331,19 @@ Rules:
     data.setdefault("support_plan", [])
     data.setdefault("success_metric", "Agree one measurable business outcome with the founder.")
     data.setdefault("assumptions", [])
+
+    # Guardrail for network matching: capture an explicit industrial target sector
+    # even if the model focuses on the founder's company rather than the buyer.
+    request_lower = request.lower()
+    industrial_signals = [
+        "industrial customer", "industrial customers",
+        "industrial client", "industrial clients",
+        "manufacturing customer", "manufacturing customers",
+        "factory", "factories", "manufacturer", "manufacturers"
+    ]
+    if not data["industries"] and any(signal in request_lower for signal in industrial_signals):
+        data["industries"] = ["Industrial Technology"]
+
     return data
 
 
@@ -658,7 +688,7 @@ div[data-testid="stMetric"] {
 # Sidebar
 with st.sidebar:
     st.markdown("### FV Network Copilot")
-    st.caption("Interview prototype · v3.1")
+    st.caption("Interview prototype · v3.2")
 
     if AI_ENABLED:
         st.success("AI layer connected")
