@@ -1,0 +1,19 @@
+{
+  "weights": {
+    "country_match": 30,
+    "industry_match": 25,
+    "expertise_match": 25,
+    "help_type_match": 15,
+    "availability_bonus": {
+      "High": 5,
+      "Medium": 3,
+      "Low": 0
+    }
+  },
+  "notes": [
+    "Scores are deliberately simple and explainable for the MVP.",
+    "The LLM should extract structured needs first; deterministic scoring ranks the network members.",
+    "The LLM can then explain the ranking, but it should not invent profile facts.",
+    "A human at Family Ventures validates any introduction before it is sent."
+  ]
+}

@@ -1,0 +1,814 @@
+[
+  {
+    "id": "FV001",
+    "name": "Anna Keller",
+    "role": "Former Germany General Manager",
+    "company_type": "Industrial group",
+    "countries": [
+      "Germany",
+      "Austria",
+      "Switzerland"
+    ],
+    "industries": [
+      "Manufacturing",
+      "Automotive",
+      "Energy"
+    ],
+    "expertise": [
+      "Market entry",
+      "Enterprise sales",
+      "Industrial partnerships",
+      "Pricing"
+    ],
+    "can_help_with": [
+      "German GTM",
+      "Customer introductions",
+      "Partnerships",
+      "Recruitment"
+    ],
+    "seniority": "Executive",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV002",
+    "name": "Marc Dubois",
+    "role": "Family Business Executive",
+    "company_type": "Automotive supplier",
+    "countries": [
+      "France",
+      "Germany"
+    ],
+    "industries": [
+      "Automotive",
+      "Manufacturing"
+    ],
+    "expertise": [
+      "Enterprise sales",
+      "Industrial procurement",
+      "Partnerships"
+    ],
+    "can_help_with": [
+      "Customer introductions",
+      "Procurement insight",
+      "Commercial strategy"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  },
+  {
+    "id": "FV003",
+    "name": "Sofia Rossi",
+    "role": "Former VP Sales Europe",
+    "company_type": "B2B software",
+    "countries": [
+      "Italy",
+      "France",
+      "Spain"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "AI"
+    ],
+    "expertise": [
+      "Enterprise sales",
+      "Sales hiring",
+      "Go-to-market",
+      "Channel strategy"
+    ],
+    "can_help_with": [
+      "Sales playbook",
+      "Hiring",
+      "European expansion"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  },
+  {
+    "id": "FV004",
+    "name": "Thomas Meyer",
+    "role": "Former Procurement Director",
+    "company_type": "Automotive OEM",
+    "countries": [
+      "Germany"
+    ],
+    "industries": [
+      "Automotive",
+      "Industrial Technology"
+    ],
+    "expertise": [
+      "Procurement",
+      "Supplier qualification",
+      "Enterprise buying"
+    ],
+    "can_help_with": [
+      "Buyer perspective",
+      "Enterprise sales preparation",
+      "Procurement introductions"
+    ],
+    "seniority": "Executive",
+    "availability": "Low"
+  },
+  {
+    "id": "FV005",
+    "name": "Claire Martin",
+    "role": "Family Office Investment Director",
+    "company_type": "Family office",
+    "countries": [
+      "France",
+      "Belgium"
+    ],
+    "industries": [
+      "Energy",
+      "Climate",
+      "Industrial Technology"
+    ],
+    "expertise": [
+      "Fundraising",
+      "Governance",
+      "Strategic finance"
+    ],
+    "can_help_with": [
+      "Fundraising",
+      "Board preparation",
+      "Investor introductions"
+    ],
+    "seniority": "Executive",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV006",
+    "name": "David Cohen",
+    "role": "Serial Entrepreneur",
+    "company_type": "Technology company",
+    "countries": [
+      "Israel",
+      "United States"
+    ],
+    "industries": [
+      "Cybersecurity",
+      "AI",
+      "Enterprise Software"
+    ],
+    "expertise": [
+      "Product-market fit",
+      "US expansion",
+      "Fundraising",
+      "Enterprise sales"
+    ],
+    "can_help_with": [
+      "US GTM",
+      "Founder coaching",
+      "Fundraising",
+      "Sales strategy"
+    ],
+    "seniority": "Founder",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV007",
+    "name": "Elena García",
+    "role": "Former Chief People Officer",
+    "company_type": "Scale-up",
+    "countries": [
+      "Spain",
+      "France",
+      "United Kingdom"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "Consumer Technology"
+    ],
+    "expertise": [
+      "Executive hiring",
+      "Org design",
+      "Compensation"
+    ],
+    "can_help_with": [
+      "VP hiring",
+      "Leadership team design",
+      "International recruiting"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  },
+  {
+    "id": "FV008",
+    "name": "James Walker",
+    "role": "Former UK Managing Director",
+    "company_type": "Industrial technology company",
+    "countries": [
+      "United Kingdom",
+      "Ireland"
+    ],
+    "industries": [
+      "Industrial Technology",
+      "Energy"
+    ],
+    "expertise": [
+      "UK market entry",
+      "Enterprise sales",
+      "Strategic partnerships"
+    ],
+    "can_help_with": [
+      "UK GTM",
+      "Customer introductions",
+      "Partnership strategy"
+    ],
+    "seniority": "Executive",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV009",
+    "name": "Isabelle Laurent",
+    "role": "Family Business Board Member",
+    "company_type": "Consumer goods group",
+    "countries": [
+      "France",
+      "Switzerland"
+    ],
+    "industries": [
+      "Consumer",
+      "Retail",
+      "Luxury"
+    ],
+    "expertise": [
+      "Governance",
+      "Brand strategy",
+      "Retail partnerships"
+    ],
+    "can_help_with": [
+      "Board topics",
+      "Brand positioning",
+      "Retail introductions"
+    ],
+    "seniority": "Board",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV010",
+    "name": "Lars Nielsen",
+    "role": "Energy Transition Executive",
+    "company_type": "Energy company",
+    "countries": [
+      "Denmark",
+      "Sweden",
+      "Norway"
+    ],
+    "industries": [
+      "Energy",
+      "Climate",
+      "Infrastructure"
+    ],
+    "expertise": [
+      "Energy transition",
+      "Project finance",
+      "Industrial partnerships"
+    ],
+    "can_help_with": [
+      "Nordic market entry",
+      "Industry introductions",
+      "Project financing"
+    ],
+    "seniority": "Executive",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV011",
+    "name": "Nadia Benali",
+    "role": "Former Chief Marketing Officer",
+    "company_type": "B2B SaaS",
+    "countries": [
+      "France",
+      "United Kingdom"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "AI"
+    ],
+    "expertise": [
+      "Positioning",
+      "Demand generation",
+      "Category creation"
+    ],
+    "can_help_with": [
+      "Messaging",
+      "B2B marketing",
+      "Launch strategy"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  },
+  {
+    "id": "FV012",
+    "name": "Pierre Moreau",
+    "role": "Industrial CEO",
+    "company_type": "Family-owned manufacturing company",
+    "countries": [
+      "France",
+      "Germany",
+      "Poland"
+    ],
+    "industries": [
+      "Manufacturing",
+      "Industrial Technology"
+    ],
+    "expertise": [
+      "Operations",
+      "Factory automation",
+      "Industrial sales"
+    ],
+    "can_help_with": [
+      "Pilot customers",
+      "Industrial feedback",
+      "Operations"
+    ],
+    "seniority": "CEO",
+    "availability": "Low"
+  },
+  {
+    "id": "FV013",
+    "name": "Marta Kowalska",
+    "role": "Central Europe Expansion Lead",
+    "company_type": "Technology scale-up",
+    "countries": [
+      "Poland",
+      "Czech Republic",
+      "Germany"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "Logistics"
+    ],
+    "expertise": [
+      "Market entry",
+      "Localization",
+      "Channel partnerships"
+    ],
+    "can_help_with": [
+      "Central Europe GTM",
+      "Local hiring",
+      "Partner introductions"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  },
+  {
+    "id": "FV014",
+    "name": "Alexander Stein",
+    "role": "Former Automotive COO",
+    "company_type": "Automotive supplier",
+    "countries": [
+      "Germany",
+      "United States"
+    ],
+    "industries": [
+      "Automotive",
+      "Robotics",
+      "Manufacturing"
+    ],
+    "expertise": [
+      "Operations",
+      "Automotive sales",
+      "Supplier ecosystem"
+    ],
+    "can_help_with": [
+      "OEM introductions",
+      "Operational scaling",
+      "US-Germany bridge"
+    ],
+    "seniority": "Executive",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV015",
+    "name": "Emma Thompson",
+    "role": "Growth Advisor",
+    "company_type": "Venture-backed scale-ups",
+    "countries": [
+      "United Kingdom",
+      "United States"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "AI",
+      "Fintech"
+    ],
+    "expertise": [
+      "Growth strategy",
+      "US market entry",
+      "Pricing"
+    ],
+    "can_help_with": [
+      "US GTM",
+      "Growth model",
+      "Pricing strategy"
+    ],
+    "seniority": "Advisor",
+    "availability": "High"
+  },
+  {
+    "id": "FV016",
+    "name": "Julien Bernard",
+    "role": "Former CFO",
+    "company_type": "Industrial group",
+    "countries": [
+      "France",
+      "Belgium"
+    ],
+    "industries": [
+      "Manufacturing",
+      "Energy"
+    ],
+    "expertise": [
+      "Strategic finance",
+      "Cash management",
+      "M&A"
+    ],
+    "can_help_with": [
+      "Financial planning",
+      "Fundraising readiness",
+      "M&A"
+    ],
+    "seniority": "Executive",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV017",
+    "name": "Helena Fischer",
+    "role": "B2B Partnerships Director",
+    "company_type": "Technology company",
+    "countries": [
+      "Germany",
+      "Netherlands"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "Industrial Technology"
+    ],
+    "expertise": [
+      "Strategic partnerships",
+      "Channel sales",
+      "Ecosystem development"
+    ],
+    "can_help_with": [
+      "Partner strategy",
+      "Introductions",
+      "German market"
+    ],
+    "seniority": "Director",
+    "availability": "High"
+  },
+  {
+    "id": "FV018",
+    "name": "Olivier Renard",
+    "role": "Former Defense Industry Executive",
+    "company_type": "Defense contractor",
+    "countries": [
+      "France",
+      "Belgium"
+    ],
+    "industries": [
+      "Defense",
+      "Cybersecurity",
+      "Industrial Technology"
+    ],
+    "expertise": [
+      "Defense procurement",
+      "Regulation",
+      "Public sector sales"
+    ],
+    "can_help_with": [
+      "Defense GTM",
+      "Procurement understanding",
+      "Regulatory navigation"
+    ],
+    "seniority": "Executive",
+    "availability": "Low"
+  },
+  {
+    "id": "FV019",
+    "name": "Sarah Levy",
+    "role": "Healthcare Entrepreneur",
+    "company_type": "Digital health company",
+    "countries": [
+      "France",
+      "Israel"
+    ],
+    "industries": [
+      "Health",
+      "Longevity",
+      "AI"
+    ],
+    "expertise": [
+      "Healthcare GTM",
+      "Regulation",
+      "Clinical partnerships"
+    ],
+    "can_help_with": [
+      "Hospital introductions",
+      "Health regulation",
+      "Founder coaching"
+    ],
+    "seniority": "Founder",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV020",
+    "name": "Matteo Bianchi",
+    "role": "Former Southern Europe GM",
+    "company_type": "Industrial equipment",
+    "countries": [
+      "Italy",
+      "Spain",
+      "Portugal"
+    ],
+    "industries": [
+      "Manufacturing",
+      "Energy"
+    ],
+    "expertise": [
+      "Market entry",
+      "Distributor strategy",
+      "Enterprise sales"
+    ],
+    "can_help_with": [
+      "Southern Europe GTM",
+      "Distributor introductions",
+      "Pricing"
+    ],
+    "seniority": "Executive",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV021",
+    "name": "Charlotte Petit",
+    "role": "Talent Partner",
+    "company_type": "Venture ecosystem",
+    "countries": [
+      "France",
+      "United Kingdom"
+    ],
+    "industries": [
+      "Technology",
+      "Enterprise Software"
+    ],
+    "expertise": [
+      "Executive search",
+      "Talent mapping",
+      "Compensation"
+    ],
+    "can_help_with": [
+      "C-level hiring",
+      "VP hiring",
+      "Talent benchmarking"
+    ],
+    "seniority": "Partner",
+    "availability": "High"
+  },
+  {
+    "id": "FV022",
+    "name": "Robert Klein",
+    "role": "Industrial Family Shareholder",
+    "company_type": "Family-owned chemicals group",
+    "countries": [
+      "Germany",
+      "Switzerland"
+    ],
+    "industries": [
+      "Chemicals",
+      "Manufacturing",
+      "Climate"
+    ],
+    "expertise": [
+      "Industrial partnerships",
+      "Governance",
+      "Long-term strategy"
+    ],
+    "can_help_with": [
+      "Industrial introductions",
+      "Governance",
+      "DACH network"
+    ],
+    "seniority": "Board",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV023",
+    "name": "Amélie Roux",
+    "role": "Former Head of Customer Success",
+    "company_type": "B2B SaaS",
+    "countries": [
+      "France",
+      "United States"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "AI"
+    ],
+    "expertise": [
+      "Customer success",
+      "Retention",
+      "Expansion revenue"
+    ],
+    "can_help_with": [
+      "Retention strategy",
+      "Enterprise onboarding",
+      "US customer success"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  },
+  {
+    "id": "FV024",
+    "name": "Victor Hansen",
+    "role": "Robotics Entrepreneur",
+    "company_type": "Robotics company",
+    "countries": [
+      "Sweden",
+      "Germany"
+    ],
+    "industries": [
+      "Robotics",
+      "Physical AI",
+      "Manufacturing"
+    ],
+    "expertise": [
+      "Robotics GTM",
+      "Industrial pilots",
+      "Product strategy"
+    ],
+    "can_help_with": [
+      "Pilot design",
+      "Industrial introductions",
+      "Product feedback"
+    ],
+    "seniority": "Founder",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV025",
+    "name": "Laura Smith",
+    "role": "Former VP Business Development",
+    "company_type": "Climate technology company",
+    "countries": [
+      "United Kingdom",
+      "France",
+      "United States"
+    ],
+    "industries": [
+      "Climate",
+      "Energy",
+      "Industrial Technology"
+    ],
+    "expertise": [
+      "Business development",
+      "Strategic partnerships",
+      "Fundraising"
+    ],
+    "can_help_with": [
+      "Commercial partnerships",
+      "US introductions",
+      "Fundraising"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  },
+  {
+    "id": "FV026",
+    "name": "Hugo Lambert",
+    "role": "Family Business CEO",
+    "company_type": "Logistics group",
+    "countries": [
+      "France",
+      "Belgium",
+      "Netherlands"
+    ],
+    "industries": [
+      "Logistics",
+      "Industrial Technology"
+    ],
+    "expertise": [
+      "Operations",
+      "Procurement",
+      "B2B sales"
+    ],
+    "can_help_with": [
+      "Logistics customers",
+      "Procurement insight",
+      "Benelux introductions"
+    ],
+    "seniority": "CEO",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV027",
+    "name": "Miriam Adler",
+    "role": "Cybersecurity Advisor",
+    "company_type": "Cybersecurity ecosystem",
+    "countries": [
+      "Israel",
+      "Germany"
+    ],
+    "industries": [
+      "Cybersecurity",
+      "Defense",
+      "Enterprise Software"
+    ],
+    "expertise": [
+      "Security sales",
+      "Enterprise procurement",
+      "Product positioning"
+    ],
+    "can_help_with": [
+      "Cybersecurity GTM",
+      "Buyer introductions",
+      "Security positioning"
+    ],
+    "seniority": "Advisor",
+    "availability": "Medium"
+  },
+  {
+    "id": "FV028",
+    "name": "François Girard",
+    "role": "Former Retail Group COO",
+    "company_type": "Retail group",
+    "countries": [
+      "France",
+      "Spain",
+      "Italy"
+    ],
+    "industries": [
+      "Retail",
+      "Consumer",
+      "Logistics"
+    ],
+    "expertise": [
+      "Retail operations",
+      "Procurement",
+      "Omnichannel"
+    ],
+    "can_help_with": [
+      "Retail pilots",
+      "Procurement",
+      "Commercial introductions"
+    ],
+    "seniority": "Executive",
+    "availability": "Low"
+  },
+  {
+    "id": "FV029",
+    "name": "Eva de Vries",
+    "role": "Benelux Market Entry Advisor",
+    "company_type": "Consulting / operating background",
+    "countries": [
+      "Netherlands",
+      "Belgium",
+      "Luxembourg"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "Climate",
+      "Logistics"
+    ],
+    "expertise": [
+      "Market entry",
+      "Partnerships",
+      "Enterprise sales"
+    ],
+    "can_help_with": [
+      "Benelux GTM",
+      "Partner introductions",
+      "Sales strategy"
+    ],
+    "seniority": "Advisor",
+    "availability": "High"
+  },
+  {
+    "id": "FV030",
+    "name": "Daniel Brooks",
+    "role": "Former US Enterprise Sales Leader",
+    "company_type": "Enterprise technology",
+    "countries": [
+      "United States",
+      "United Kingdom"
+    ],
+    "industries": [
+      "Enterprise Software",
+      "AI",
+      "Cybersecurity"
+    ],
+    "expertise": [
+      "Enterprise sales",
+      "Sales hiring",
+      "US GTM",
+      "Pricing"
+    ],
+    "can_help_with": [
+      "US expansion",
+      "Enterprise sales playbook",
+      "VP Sales hiring"
+    ],
+    "seniority": "Executive",
+    "availability": "High"
+  }
+]

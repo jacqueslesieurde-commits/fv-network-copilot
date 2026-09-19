@@ -1,0 +1,61 @@
+[
+  {
+    "id": "SC001",
+    "company": "ForgeAI",
+    "sector": "Industrial AI",
+    "request": "We want to enter Germany and sign our first three large industrial customers within six months.",
+    "expected_needs": [
+      "German market entry",
+      "Enterprise sales",
+      "Industrial introductions",
+      "GTM strategy"
+    ]
+  },
+  {
+    "id": "SC002",
+    "company": "GridLoop",
+    "sector": "Climate / Energy",
+    "request": "We need to expand into the Nordics and find strategic partners in the energy sector.",
+    "expected_needs": [
+      "Nordic market entry",
+      "Energy partnerships",
+      "Business development"
+    ]
+  },
+  {
+    "id": "SC003",
+    "company": "SecureFlow",
+    "sector": "Cybersecurity",
+    "request": "We are preparing our US launch and need help hiring a VP Sales and getting our first enterprise references.",
+    "expected_needs": [
+      "US GTM",
+      "VP Sales hiring",
+      "Enterprise sales",
+      "Customer introductions"
+    ]
+  },
+  {
+    "id": "SC004",
+    "company": "LongevAI",
+    "sector": "Digital Health",
+    "request": "We need introductions to hospitals and advice on navigating healthcare partnerships in France.",
+    "expected_needs": [
+      "Healthcare partnerships",
+      "Hospital introductions",
+      "Regulation",
+      "France"
+    ]
+  },
+  {
+    "id": "SC005",
+    "company": "RoboWorks",
+    "sector": "Physical AI / Robotics",
+    "request": "We have a working product and now need industrial pilot customers in Germany and Sweden.",
+    "expected_needs": [
+      "Industrial pilots",
+      "Germany",
+      "Sweden",
+      "Customer introductions"
+    ]
+  }
+]
