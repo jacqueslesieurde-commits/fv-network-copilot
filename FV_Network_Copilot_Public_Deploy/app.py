@@ -329,22 +329,38 @@ def same_industry_family(request_industry, profile_industry):
 
 
 def industry_score(requested, profile_values, max_points=25):
+    """
+    Exact industry matches receive full credit.
+    Related industries from the same family receive partial credit.
+    This keeps the ranking intuitive: adjacent expertise helps, but should not
+    outrank a profile with a direct sector match.
+    """
     if not requested:
         return 0, []
 
-    matched_requests = []
+    total_credit = 0.0
     explanations = []
 
     for req in requested:
+        best_credit = 0.0
+        best_label = None
+
         for profile_industry in profile_values:
-            if same_industry_family(req, profile_industry):
-                matched_requests.append(req)
-                label = profile_industry if req != profile_industry else req
-                if label not in explanations:
-                    explanations.append(label)
+            if req.lower() == profile_industry.lower():
+                best_credit = 1.0
+                best_label = profile_industry
                 break
 
-    coverage = len(set(matched_requests)) / len(set(requested))
+            if same_industry_family(req, profile_industry) and best_credit < 0.55:
+                best_credit = 0.55
+                best_label = profile_industry
+
+        total_credit += best_credit
+
+        if best_label and best_label not in explanations:
+            explanations.append(best_label)
+
+    coverage = total_credit / len(requested)
     return round(max_points * coverage), explanations
 
 
@@ -394,7 +410,34 @@ def score_profile(analysis, profile):
     availability = profile.get("availability", "Low")
     availability_pts = {"High": 5, "Medium": 3, "Low": 0}.get(availability, 0)
 
-    score = min(100, geo_pts + industry_pts + expertise_pts + help_pts + availability_pts)
+    # Small role-fit adjustment: for commercial expansion requests, reward direct
+    # enterprise-sales / market-entry capability and avoid over-rewarding adjacent
+    # industrial profiles whose main strength is pilots or product feedback.
+    role_adjustment = 0
+    haystack = " | ".join(
+        profile.get("expertise", []) + profile.get("can_help_with", [])
+    ).lower()
+
+    commercial_request = any(
+        need in needs
+        for need in ["Market entry", "Enterprise sales", "Customer introductions", "GTM strategy"]
+    )
+
+    if commercial_request:
+        if any(term in haystack for term in ["enterprise sales", "market entry", "german gtm", "sales strategy"]):
+            role_adjustment += 4
+        if "procurement" in haystack or "buyer" in haystack:
+            role_adjustment += 2
+        if "pilot design" in haystack and "enterprise sales" not in haystack:
+            role_adjustment -= 4
+
+    score = min(
+        100,
+        max(
+            0,
+            geo_pts + industry_pts + expertise_pts + help_pts + availability_pts + role_adjustment
+        )
+    )
 
     reasons = []
     if geo_hits:
@@ -411,6 +454,7 @@ def score_profile(analysis, profile):
         "Expertise coverage": expertise_pts,
         "Help type": help_pts,
         "Availability": availability_pts,
+        "Role fit adjustment": role_adjustment,
     }
 
     return score, reasons, breakdown, matched_needs
@@ -496,6 +540,8 @@ Network member facts: {json.dumps(facts, ensure_ascii=False)}
 Constraints:
 - Do not invent anything not in the facts.
 - Explain in one sentence why this person is relevant.
+- Position the first interaction as a focused working session to challenge the founder's approach.
+- Do not promise or request customer introductions in the first email unless the request explicitly depends on them.
 - Ask for a focused 30-minute conversation.
 - Keep it under 120 words.
 - Output only the email.
@@ -612,6 +658,7 @@ div[data-testid="stMetric"] {
 # Sidebar
 with st.sidebar:
     st.markdown("### FV Network Copilot")
+    st.caption("Interview prototype · v3.1")
 
     if AI_ENABLED:
         st.success("AI layer connected")
@@ -706,10 +753,31 @@ if "analysis" in st.session_state:
     # 1 Need analysis
     st.markdown("## 1. Need analysis")
 
+    objective = analysis.get("objective", "—")
+    geography = ", ".join(analysis.get("countries", [])) or "Not specified"
+    industry = ", ".join(analysis.get("industries", [])) or "Not specified"
+
     m1, m2, m3 = st.columns(3)
-    m1.metric("Objective", analysis.get("objective", "—"))
-    m2.metric("Geography", ", ".join(analysis.get("countries", [])) or "Not specified")
-    m3.metric("Industry", ", ".join(analysis.get("industries", [])) or "Not specified")
+
+    for col, label, value in [
+        (m1, "Objective", objective),
+        (m2, "Geography", geography),
+        (m3, "Industry", industry),
+    ]:
+        with col:
+            st.markdown(
+                f"""
+                <div style="
+                    border:1px solid rgba(128,128,128,.20);
+                    padding:14px 16px;
+                    border-radius:14px;
+                    min-height:112px;">
+                    <div style="font-size:.82rem; opacity:.68; margin-bottom:8px;">{label}</div>
+                    <div style="font-size:1.35rem; font-weight:650; line-height:1.18;">{value}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     st.markdown("**Needs detected**")
     needs_html = "".join(
@@ -759,7 +827,7 @@ if "analysis" in st.session_state:
                     st.write(f"{label}: **{points} pts**")
                 st.caption(
                     "Score = geography (30) + industry (25) + expertise coverage (25) "
-                    "+ help type (15) + availability (5)."
+                    "+ help type (15) + availability (5), with a small transparent role-fit adjustment."
                 )
 
     # 4 Action
