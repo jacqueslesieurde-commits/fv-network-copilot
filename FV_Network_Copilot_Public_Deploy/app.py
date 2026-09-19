@@ -2,6 +2,7 @@
 import json
 import re
 from pathlib import Path
+
 import streamlit as st
 
 try:
@@ -9,7 +10,13 @@ try:
 except Exception:
     OpenAI = None
 
+
+# ============================================================
+# CONFIG & DATA
+# ============================================================
+
 BASE_DIR = Path(__file__).parent
+MODEL_NAME = "gpt-5.6-luna"
 
 with open(BASE_DIR / "network_profiles.json", encoding="utf-8") as f:
     PROFILES = json.load(f)
@@ -17,9 +24,18 @@ with open(BASE_DIR / "network_profiles.json", encoding="utf-8") as f:
 with open(BASE_DIR / "startup_scenarios.json", encoding="utf-8") as f:
     SCENARIOS = json.load(f)
 
-# ----------------------------
-# Deterministic fallback layer
-# ----------------------------
+try:
+    API_KEY = st.secrets.get("OPENAI_API_KEY", "")
+except Exception:
+    API_KEY = ""
+
+AI_ENABLED = bool(API_KEY and OpenAI is not None)
+
+
+# ============================================================
+# FALLBACK UNDERSTANDING
+# ============================================================
+
 COUNTRY_KEYWORDS = {
     "germany": "Germany", "german": "Germany", "allemagne": "Germany", "allemand": "Germany",
     "france": "France", "french": "France",
@@ -32,28 +48,46 @@ COUNTRY_KEYWORDS = {
     "denmark": "Denmark", "danemark": "Denmark",
     "netherlands": "Netherlands", "pays-bas": "Netherlands",
     "belgium": "Belgium", "belgique": "Belgium",
-    "israel": "Israel", "poland": "Poland", "pologne": "Poland",
+    "israel": "Israel",
+    "poland": "Poland", "pologne": "Poland",
+    "switzerland": "Switzerland", "suisse": "Switzerland",
 }
 
 INDUSTRY_KEYWORDS = {
     "industrial": "Industrial Technology", "industrie": "Industrial Technology",
-    "manufacturing": "Manufacturing", "automotive": "Automotive", "automobile": "Automotive",
-    "energy": "Energy", "énergie": "Energy", "climate": "Climate", "climat": "Climate",
-    "ai": "AI", "ia": "AI", "software": "Enterprise Software", "saas": "Enterprise Software",
+    "manufacturing": "Manufacturing", "factory": "Manufacturing",
+    "automotive": "Automotive", "automobile": "Automotive",
+    "energy": "Energy", "énergie": "Energy",
+    "climate": "Climate", "climat": "Climate",
+    "ai": "AI", "ia": "AI",
+    "software": "Enterprise Software", "saas": "Enterprise Software",
     "cyber": "Cybersecurity", "cybersecurity": "Cybersecurity",
     "robotics": "Robotics", "robotique": "Robotics",
-    "health": "Health", "santé": "Health", "longevity": "Longevity", "longévité": "Longevity",
-    "retail": "Retail", "logistics": "Logistics", "logistique": "Logistics",
+    "health": "Health", "santé": "Health",
+    "longevity": "Longevity", "longévité": "Longevity",
+    "retail": "Retail",
+    "logistics": "Logistics", "logistique": "Logistics",
     "defense": "Defense", "défense": "Defense",
 }
 
 NEED_RULES = {
-    "Market entry": ["enter", "launch", "expand", "market entry", "entrer", "lancer", "développer", "expansion"],
-    "Enterprise sales": ["enterprise", "large customer", "large customers", "industrial customers",
-                         "grand compte", "grands comptes", "sign our first", "sign clients", "sales"],
-    "Customer introductions": ["introduction", "introductions", "clients", "customers", "prospects", "contacts"],
-    "GTM strategy": ["gtm", "go-to-market", "go to market", "market strategy", "market entry", "enter germany",
-                     "enter france", "enter the", "expansion"],
+    "Market entry": [
+        "enter", "launch", "expand", "market entry", "go into",
+        "entrer", "lancer", "développer", "expansion"
+    ],
+    "Enterprise sales": [
+        "enterprise", "large customer", "large customers", "industrial customers",
+        "grand compte", "grands comptes", "sign our first", "sign clients",
+        "sales", "sell to"
+    ],
+    "Customer introductions": [
+        "introduction", "introductions", "clients", "customers",
+        "prospects", "contacts", "buyers"
+    ],
+    "GTM strategy": [
+        "gtm", "go-to-market", "go to market", "market strategy",
+        "market entry", "enter germany", "enter france", "enter the", "expansion"
+    ],
     "Recruitment": ["hire", "hiring", "recruit", "recrut", "vp sales", "talent"],
     "Strategic partnerships": ["partner", "partnership", "partners", "partenaire", "partenariat"],
     "Fundraising": ["fundraising", "raise", "levée", "investor", "investisseur"],
@@ -62,12 +96,45 @@ NEED_RULES = {
     "Pricing": ["pricing", "price", "tarif", "prix"],
 }
 
+
+# ============================================================
+# MATCHING TAXONOMY
+# ============================================================
+
+INDUSTRY_FAMILIES = {
+    "industrial": {
+        "Industrial Technology", "Manufacturing", "Automotive", "Robotics",
+        "Physical AI", "Chemicals", "Logistics"
+    },
+    "digital": {
+        "AI", "Enterprise Software", "Cybersecurity", "Fintech",
+        "Consumer Technology", "Technology"
+    },
+    "energy_climate": {
+        "Energy", "Climate", "Infrastructure"
+    },
+    "health_longevity": {
+        "Health", "Longevity", "Digital Health"
+    },
+    "consumer_retail": {
+        "Consumer", "Retail", "Luxury"
+    },
+    "defense": {
+        "Defense", "Cybersecurity", "Industrial Technology"
+    },
+}
+
 HELP_SYNONYMS = {
     "Market entry": ["market entry", "gtm", "expansion", "german gtm", "uk gtm", "us gtm"],
-    "Enterprise sales": ["enterprise sales", "commercial strategy", "sales strategy", "sales playbook", "b2b sales",
-                         "automotive sales", "public sector sales"],
-    "Customer introductions": ["customer introductions", "introductions", "pilot customers", "oem introductions",
-                               "hospital introductions", "industrial introductions", "buyer introductions"],
+    "Enterprise sales": [
+        "enterprise sales", "commercial strategy", "sales strategy",
+        "sales playbook", "b2b sales", "automotive sales", "public sector sales"
+    ],
+    "Customer introductions": [
+        "customer introductions", "introductions", "pilot customers",
+        "oem introductions", "hospital introductions", "industrial introductions",
+        "buyer introductions", "commercial introductions"
+    ],
     "GTM strategy": ["gtm", "market entry", "launch strategy", "sales playbook", "growth strategy"],
     "Recruitment": ["hiring", "recruitment", "executive search", "vp hiring", "sales hiring"],
     "Strategic partnerships": ["partnership", "partner", "ecosystem", "commercial partnerships"],
@@ -77,24 +144,67 @@ HELP_SYNONYMS = {
     "Pricing": ["pricing"],
 }
 
+
+# ============================================================
+# HELPERS
+# ============================================================
+
 def normalise(text):
     return re.sub(r"\s+", " ", text.lower()).strip()
 
+
+def fallback_support_plan(analysis):
+    countries = analysis.get("countries", [])
+    needs = analysis.get("needs", [])
+    plan = []
+
+    if "Market entry" in needs:
+        market = countries[0] if countries else "the target market"
+        plan.append(f"Validate the go-to-market assumptions and ICP for {market}.")
+    if "Enterprise sales" in needs:
+        plan.append("Pressure-test the enterprise sales motion, buyer journey and target-account list.")
+    if "Customer introductions" in needs:
+        plan.append("Identify the smallest set of high-value warm introductions after the ICP is validated.")
+    if "Strategic partnerships" in needs:
+        plan.append("Map priority strategic partners and identify warm paths through the network.")
+    if "Recruitment" in needs:
+        plan.append("Define the role scorecard and mobilise operators who can benchmark or refer candidates.")
+    if "Fundraising" in needs:
+        plan.append("Review fundraising readiness, narrative and relevant investor introductions.")
+    if "Regulation" in needs:
+        plan.append("Validate the key regulatory questions with a relevant operator or domain expert.")
+    if "Industrial pilots" in needs:
+        plan.append("Define the pilot value proposition and shortlist 3–5 potential industrial pilot customers.")
+    if "Pricing" in needs:
+        plan.append("Benchmark pricing assumptions with operators who know the target customer.")
+
+    generic = [
+        "Clarify the founder's highest-priority bottleneck and desired measurable outcome.",
+        "Activate only the most relevant operators first, then expand the network if needed.",
+    ]
+    for item in generic:
+        if len(plan) < 4:
+            plan.append(item)
+
+    return plan[:4]
+
+
 def fallback_extract(request):
     t = normalise(request)
+
     countries = []
-    for kw, value in COUNTRY_KEYWORDS.items():
-        if re.search(rf"\b{re.escape(kw)}\b", t) and value not in countries:
+    for keyword, value in COUNTRY_KEYWORDS.items():
+        if re.search(rf"\b{re.escape(keyword)}\b", t) and value not in countries:
             countries.append(value)
 
     industries = []
-    for kw, value in INDUSTRY_KEYWORDS.items():
-        if re.search(rf"\b{re.escape(kw)}\b", t) and value not in industries:
+    for keyword, value in INDUSTRY_KEYWORDS.items():
+        if re.search(rf"\b{re.escape(keyword)}\b", t) and value not in industries:
             industries.append(value)
 
     needs = []
     for need, keywords in NEED_RULES.items():
-        if any(kw in t for kw in keywords):
+        if any(keyword in t for keyword in keywords):
             needs.append(need)
 
     if not needs:
@@ -103,233 +213,270 @@ def fallback_extract(request):
     if "Market entry" in needs:
         objective = "International market expansion"
     elif "Recruitment" in needs:
-        objective = "Team scaling"
+        objective = "Scale the leadership team"
     elif "Fundraising" in needs:
-        objective = "Fundraising readiness"
+        objective = "Prepare the next fundraising round"
     elif "Industrial pilots" in needs:
-        objective = "Secure industrial pilots"
+        objective = "Secure industrial pilot customers"
     else:
-        objective = "Founder support"
+        objective = "Resolve the founder's priority bottleneck"
 
-    return {
+    analysis = {
         "objective": objective,
         "countries": countries,
         "industries": industries,
         "needs": needs,
-        "support_plan": fallback_support_plan({
-            "objective": objective,
-            "countries": countries,
-            "industries": industries,
-            "needs": needs,
-        }),
-        "success_metric": "Define a measurable outcome with the founder.",
-        "assumptions": ["Analysis based only on the founder request provided."]
+        "success_metric": "Agree one measurable business outcome with the founder.",
+        "assumptions": ["Fallback analysis based only on the request text."],
     }
+    analysis["support_plan"] = fallback_support_plan(analysis)
+    return analysis
 
-def fallback_support_plan(analysis):
-    plan = []
-    countries = analysis.get("countries", [])
-    needs = analysis.get("needs", [])
-    if "Market entry" in needs:
-        market = countries[0] if countries else "target market"
-        plan.append(f"Validate the go-to-market assumptions for {market}.")
-    if "Enterprise sales" in needs:
-        plan.append("Pressure-test the enterprise sales motion and target-account strategy.")
-    if "Customer introductions" in needs:
-        plan.append("Clarify the ideal customer profile, then identify high-value warm introductions.")
-    if "Recruitment" in needs:
-        plan.append("Define the role scorecard and identify operators who can benchmark or refer candidates.")
-    if "Strategic partnerships" in needs:
-        plan.append("Map the most relevant strategic partners and prioritise warm paths through the network.")
-    if "Fundraising" in needs:
-        plan.append("Review fundraising readiness, investor narrative and relevant investor introductions.")
-    if "Regulation" in needs:
-        plan.append("Validate the key regulatory questions with a relevant operator or domain expert.")
-    if "Industrial pilots" in needs:
-        plan.append("Select 3–5 potential pilot customers and define a clear pilot value proposition.")
-    if "Pricing" in needs:
-        plan.append("Benchmark pricing assumptions with an operator who knows the target market.")
-    if len(plan) < 3:
-        plan.append("Clarify the founder's highest-priority bottleneck and desired outcome.")
-        plan.append("Match the need with the smallest set of relevant operators in the network.")
-    return plan[:4]
 
-# ----------------------------
-# LLM layer
-# ----------------------------
 def clean_json_text(text):
     text = text.strip()
     text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"\s*```$", "", text)
     return text.strip()
 
-def llm_extract(request, api_key):
-    if OpenAI is None:
-        raise RuntimeError("The OpenAI Python package is not installed.")
 
+def llm_extract(request, api_key):
     client = OpenAI(api_key=api_key)
 
-    system_prompt = """
-You are the intake intelligence layer of FV Network Copilot, a prototype for Family Ventures.
+    instructions = """
+You are the intake intelligence layer of FV Network Copilot, a prototype designed for Family Ventures.
 
-Your job is NOT to choose network members. A deterministic matching engine will do that later.
-Your job is to understand a founder's request and convert it into structured, useful information.
+Family Ventures creates value by mobilising a network of entrepreneurial families, operators and sector experts
+to support founders. Your role is to understand a founder request. You do NOT select network members:
+a deterministic, explainable matching engine does that later.
 
-Return ONLY valid JSON. No markdown and no extra text.
+Return ONLY valid JSON, no markdown.
 
-Use this exact schema:
+Schema:
 {
-  "objective": "short business objective",
+  "objective": "short, concrete business objective",
   "countries": ["Country"],
   "industries": ["Industry"],
   "needs": ["Need"],
   "support_plan": ["Action 1", "Action 2", "Action 3", "Action 4"],
   "success_metric": "one measurable outcome",
-  "assumptions": ["assumption or missing information"]
+  "assumptions": ["missing information or direct assumption"]
 }
 
 Allowed needs:
-- Market entry
-- Enterprise sales
-- Customer introductions
-- GTM strategy
-- Recruitment
-- Strategic partnerships
-- Fundraising
-- Regulation
-- Industrial pilots
-- Pricing
-- Strategic support
+Market entry
+Enterprise sales
+Customer introductions
+GTM strategy
+Recruitment
+Strategic partnerships
+Fundraising
+Regulation
+Industrial pilots
+Pricing
+Strategic support
 
-Industry labels should preferably use:
-Industrial Technology, Manufacturing, Automotive, Energy, Climate, AI,
-Enterprise Software, Cybersecurity, Robotics, Health, Longevity, Retail,
-Logistics, Defense.
+Preferred industry labels:
+Industrial Technology
+Manufacturing
+Automotive
+Energy
+Climate
+AI
+Enterprise Software
+Cybersecurity
+Robotics
+Health
+Longevity
+Retail
+Logistics
+Defense
 
 Rules:
-- Extract only what is supported by the founder request.
-- You may infer a useful need when it is a direct business implication, but list uncertainty under assumptions.
-- Do not invent company facts, contacts, traction, geography, or deadlines.
-- Keep the support plan practical for an investor / operator network.
-- Customer introductions should not be the first action if the commercial target or ICP is still unclear.
+- Use only information supported by the founder request.
+- You may infer a direct business implication, but make uncertainty explicit in assumptions.
+- Do not invent traction, customers, contacts, budgets, company facts or deadlines.
+- Make the support plan practical for an investor/operator network.
+- Prefer diagnosis and preparation before introductions when the ICP or target is unclear.
+- The success metric must be concrete and tied to the request.
 """
     response = client.responses.create(
-        model="gpt-5.6-luna",
-        instructions=system_prompt,
-        input=request
+        model=MODEL_NAME,
+        instructions=instructions,
+        input=request,
     )
-    data = json.loads(clean_json_text(response.output_text))
 
-    # Ensure keys always exist
+    data = json.loads(clean_json_text(response.output_text))
     data.setdefault("objective", "Founder support")
     data.setdefault("countries", [])
     data.setdefault("industries", [])
     data.setdefault("needs", ["Strategic support"])
     data.setdefault("support_plan", [])
-    data.setdefault("success_metric", "Define a measurable outcome with the founder.")
+    data.setdefault("success_metric", "Agree one measurable business outcome with the founder.")
     data.setdefault("assumptions", [])
     return data
 
-# ----------------------------
-# Explainable ranking engine
-# ----------------------------
-def list_overlap_score(requested, profile_values, max_points):
+
+def same_industry_family(request_industry, profile_industry):
+    if request_industry.lower() == profile_industry.lower():
+        return True
+
+    for family in INDUSTRY_FAMILIES.values():
+        if request_industry in family and profile_industry in family:
+            return True
+
+    return False
+
+
+def industry_score(requested, profile_values, max_points=25):
     if not requested:
         return 0, []
-    requested_lower = {x.lower() for x in requested}
-    profile_lower = {x.lower() for x in profile_values}
-    hits = requested_lower.intersection(profile_lower)
+
+    matched_requests = []
+    explanations = []
+
+    for req in requested:
+        for profile_industry in profile_values:
+            if same_industry_family(req, profile_industry):
+                matched_requests.append(req)
+                label = profile_industry if req != profile_industry else req
+                if label not in explanations:
+                    explanations.append(label)
+                break
+
+    coverage = len(set(matched_requests)) / len(set(requested))
+    return round(max_points * coverage), explanations
+
+
+def geography_score(requested, profile_values, max_points=30):
+    if not requested:
+        return 0, []
+
+    req_lower = {x.lower(): x for x in requested}
+    profile_lower = {x.lower(): x for x in profile_values}
+    hits = [req_lower[k] for k in req_lower.keys() & profile_lower.keys()]
+
     if not hits:
         return 0, []
-    ratio = len(hits) / len(requested_lower)
-    return round(max_points * ratio), sorted(hits)
 
-def semantic_help_hits(needs, profile):
-    haystack = " | ".join(profile.get("expertise", []) + profile.get("can_help_with", [])).lower()
+    coverage = len(hits) / len(requested)
+    return round(max_points * coverage), hits
+
+
+def help_hits(needs, profile):
+    haystack = " | ".join(
+        profile.get("expertise", []) + profile.get("can_help_with", [])
+    ).lower()
+
     hits = []
     for need in needs:
         terms = HELP_SYNONYMS.get(need, [need.lower()])
         if any(term.lower() in haystack for term in terms):
             hits.append(need)
-    return hits
 
-def score_profile(analysis, p):
-    country_pts, country_hits = list_overlap_score(analysis.get("countries", []), p.get("countries", []), 30)
-    industry_pts, industry_hits = list_overlap_score(analysis.get("industries", []), p.get("industries", []), 25)
+    return list(dict.fromkeys(hits))
 
-    need_hits = semantic_help_hits(analysis.get("needs", []), p)
+
+def score_profile(analysis, profile):
+    countries = analysis.get("countries", [])
+    industries = analysis.get("industries", [])
     needs = analysis.get("needs", [])
-    coverage = (len(set(need_hits)) / len(set(needs))) if needs else 0
+
+    geo_pts, geo_hits = geography_score(countries, profile.get("countries", []), 30)
+    industry_pts, industry_hits = industry_score(industries, profile.get("industries", []), 25)
+
+    matched_needs = help_hits(needs, profile)
+    coverage = (len(set(matched_needs)) / len(set(needs))) if needs else 0
+
     expertise_pts = round(25 * coverage)
     help_pts = round(15 * coverage)
 
-    availability = p.get("availability", "Low")
+    availability = profile.get("availability", "Low")
     availability_pts = {"High": 5, "Medium": 3, "Low": 0}.get(availability, 0)
 
-    score = min(100, country_pts + industry_pts + expertise_pts + help_pts + availability_pts)
+    score = min(100, geo_pts + industry_pts + expertise_pts + help_pts + availability_pts)
 
     reasons = []
-    if country_hits:
-        reasons.append("Geography: " + ", ".join(x.title() for x in country_hits))
+    if geo_hits:
+        reasons.append("Direct geography fit: " + ", ".join(geo_hits))
     if industry_hits:
-        reasons.append("Industry fit: " + ", ".join(x.title() for x in industry_hits))
-    if need_hits:
-        reasons.append("Relevant help: " + ", ".join(need_hits[:3]))
+        reasons.append("Relevant sector background: " + ", ".join(industry_hits[:2]))
+    if matched_needs:
+        reasons.append("Can help with: " + ", ".join(matched_needs[:3]))
     reasons.append(f"Availability: {availability}")
 
     breakdown = {
-        "Geography": country_pts,
+        "Geography": geo_pts,
         "Industry": industry_pts,
-        "Expertise": expertise_pts,
+        "Expertise coverage": expertise_pts,
         "Help type": help_pts,
         "Availability": availability_pts,
     }
-    return score, reasons, breakdown
+
+    return score, reasons, breakdown, matched_needs
+
 
 def rank_profiles(analysis):
     ranked = []
-    for p in PROFILES:
-        score, reasons, breakdown = score_profile(analysis, p)
-        ranked.append({**p, "match_score": score, "reasons": reasons, "breakdown": breakdown})
-    ranked.sort(key=lambda x: (x["match_score"], x["availability"] == "High"), reverse=True)
+    for profile in PROFILES:
+        score, reasons, breakdown, matched_needs = score_profile(analysis, profile)
+        ranked.append({
+            **profile,
+            "match_score": score,
+            "reasons": reasons,
+            "breakdown": breakdown,
+            "matched_needs": matched_needs,
+        })
+
+    availability_rank = {"High": 2, "Medium": 1, "Low": 0}
+    ranked.sort(
+        key=lambda p: (
+            p["match_score"],
+            len(p["matched_needs"]),
+            availability_rank.get(p.get("availability", "Low"), 0),
+        ),
+        reverse=True,
+    )
     return ranked[:3]
 
-def recommended_action(analysis, top):
-    p = top[0]
+
+def recommended_action(analysis, ranked):
+    top = ranked[0]
+
     if "Customer introductions" in analysis.get("needs", []):
         return (
-            f"Start with a 30-minute working session with {p['name']} to validate the commercial approach "
-            "before requesting introductions."
+            f"Start with a 30-minute working session with {top['name']} to validate the target "
+            "customer and commercial approach. Only then activate introductions."
         )
-    return (
-        f"Start with a focused 30-minute session with {p['name']} around "
-        f"{', '.join(analysis.get('needs', [])[:2]).lower()}."
-    )
 
-def deterministic_intro(company, request, top_profile):
-    expertise = ", ".join(top_profile["expertise"][:2])
-    return f"""Subject: Introduction — {company} × {top_profile['name']}
+    need_text = ", ".join(analysis.get("needs", [])[:2]).lower()
+    return f"Start with a focused 30-minute working session with {top['name']} around {need_text}."
 
-Hi {top_profile['name'].split()[0]},
+
+def deterministic_intro(company, request, profile):
+    relevant = ", ".join(profile.get("expertise", [])[:2])
+    first_name = profile["name"].split()[0]
+
+    return f"""Subject: {company} × {profile['name']} — quick introduction
+
+Hi {first_name},
 
 I’m reaching out regarding {company}, a portfolio company we are supporting.
 
 Their current priority is:
 “{request}”
 
-Given your experience in {expertise}, I thought your perspective could be particularly valuable.
+Given your experience in {relevant}, I thought your perspective could be particularly useful before we activate any further introductions.
 
-Would you be open to a short 30-minute conversation with the team?
+Would you be open to a focused 30-minute conversation with the team?
 
 Best,
-Family Ventures
-"""
+Family Ventures"""
+
 
 def llm_intro(company, request, profile, api_key):
-    if OpenAI is None:
-        return deterministic_intro(company, request, profile)
-
     client = OpenAI(api_key=api_key)
+
     facts = {
         "name": profile["name"],
         "role": profile["role"],
@@ -338,6 +485,7 @@ def llm_intro(company, request, profile, api_key):
         "expertise": profile["expertise"],
         "can_help_with": profile["can_help_with"],
     }
+
     prompt = f"""
 Draft a concise, warm professional introduction email from Family Ventures.
 
@@ -346,60 +494,148 @@ Founder request: {request}
 Network member facts: {json.dumps(facts, ensure_ascii=False)}
 
 Constraints:
-- Do not invent any fact not present above.
+- Do not invent anything not in the facts.
 - Explain in one sentence why this person is relevant.
-- Ask for a 30-minute conversation.
-- Keep it under 130 words.
+- Ask for a focused 30-minute conversation.
+- Keep it under 120 words.
 - Output only the email.
 """
-    response = client.responses.create(
-        model="gpt-5.6-luna",
-        input=prompt
-    )
+    response = client.responses.create(model=MODEL_NAME, input=prompt)
     return response.output_text.strip()
 
-# ----------------------------
+
+def safe_analyze(request):
+    if AI_ENABLED:
+        try:
+            return llm_extract(request, API_KEY), "LLM"
+        except Exception:
+            analysis = fallback_extract(request)
+            return analysis, "Local fallback"
+
+    return fallback_extract(request), "Local fallback"
+
+
+def safe_intro(company, request, profile):
+    if AI_ENABLED:
+        try:
+            return llm_intro(company, request, profile, API_KEY), "LLM"
+        except Exception:
+            pass
+
+    return deterministic_intro(company, request, profile), "Local template"
+
+
+# ============================================================
 # UI
-# ----------------------------
-st.set_page_config(page_title="FV Network Copilot", page_icon="⚡", layout="wide")
+# ============================================================
+
+st.set_page_config(
+    page_title="FV Network Copilot",
+    page_icon="⚡",
+    layout="wide",
+)
 
 st.markdown("""
 <style>
-.block-container {max-width: 1180px; padding-top: 2rem; padding-bottom: 4rem;}
-.kicker {font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;}
-.ai-badge {display:inline-block; padding:6px 10px; border:1px solid rgba(128,128,128,.35);
-border-radius:999px; font-size:.82rem; margin-bottom:8px;}
-div[data-testid="stMetric"] {border: 1px solid rgba(128,128,128,.22); padding: 14px; border-radius: 14px;}
+.block-container {
+    max-width: 1180px;
+    padding-top: 2.2rem;
+    padding-bottom: 5rem;
+}
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+
+.kicker {
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    opacity: .65;
+}
+.hero-subtitle {
+    font-size: 1.03rem;
+    opacity: .72;
+    margin-top: -.5rem;
+    margin-bottom: 1.2rem;
+}
+.pill {
+    display: inline-block;
+    border: 1px solid rgba(128,128,128,.35);
+    border-radius: 999px;
+    padding: 5px 10px;
+    margin: 0 5px 5px 0;
+    font-size: .82rem;
+}
+.status-good {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: rgba(35, 134, 54, .12);
+    font-size: .82rem;
+}
+.status-safe {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: rgba(128, 128, 128, .12);
+    font-size: .82rem;
+}
+.member-card {
+    border: 1px solid rgba(128,128,128,.22);
+    border-radius: 16px;
+    padding: 18px;
+    min-height: 360px;
+}
+.score {
+    font-size: 2rem;
+    font-weight: 750;
+    margin: .4rem 0 .2rem 0;
+}
+.muted {
+    opacity: .67;
+    font-size: .91rem;
+}
+.human-box {
+    border: 1px solid rgba(128,128,128,.24);
+    border-radius: 14px;
+    padding: 13px 15px;
+    margin-top: .5rem;
+}
+div[data-testid="stMetric"] {
+    border: 1px solid rgba(128,128,128,.20);
+    padding: 14px;
+    border-radius: 14px;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# API key is loaded from Streamlit Secrets in production.
-# Never store the secret in GitHub.
-try:
-    api_key = st.secrets.get("OPENAI_API_KEY", "")
-except Exception:
-    api_key = ""
-
-ai_enabled = bool(api_key)
-
+# Sidebar
 with st.sidebar:
-    st.header("AI mode")
-    if ai_enabled:
-        st.success("LLM enabled")
-        st.caption("API key loaded securely from Streamlit Secrets.")
+    st.markdown("### FV Network Copilot")
+
+    if AI_ENABLED:
+        st.success("AI layer connected")
     else:
-        st.info("Fallback mode: local rules")
-        st.caption("Add OPENAI_API_KEY in Streamlit Secrets to enable the LLM.")
+        st.info("Local fallback active")
+
+    st.caption("The app automatically falls back to local logic if the API is unavailable.")
 
     st.divider()
-    st.header("Demo scenarios")
+    st.markdown("### Demo scenarios")
+
     scenario_labels = [f"{s['company']} — {s['sector']}" for s in SCENARIOS]
     selected = st.selectbox("Load an example", ["Custom request"] + scenario_labels)
-    st.divider()
-    st.caption("All network profiles in this prototype are fictional and synthetic.")
 
+    st.divider()
+    st.caption(
+        "Prototype data only. All network members and demo companies are fictional / synthetic."
+    )
+
+# Defaults
 default_company = "ForgeAI"
-default_request = "We want to enter Germany and sign our first three large industrial customers within six months."
+default_request = (
+    "We want to enter Germany and sign our first three large industrial customers within six months."
+)
 
 if selected != "Custom request":
     idx = scenario_labels.index(selected)
@@ -407,139 +643,177 @@ if selected != "Custom request":
     default_company = scenario["company"]
     default_request = scenario["request"]
 
-st.markdown('<div class="kicker">Family Ventures — AI Agent Challenge</div>', unsafe_allow_html=True)
+# Hero
+st.markdown('<div class="kicker">Family Ventures · AI Agent Challenge</div>', unsafe_allow_html=True)
 st.title("FV Network Copilot")
-st.caption("Turn founder needs into concrete support and the right network activation.")
+st.markdown(
+    '<div class="hero-subtitle">'
+    'From a founder request to an actionable support plan and the right network activation.'
+    '</div>',
+    unsafe_allow_html=True
+)
 
-if ai_enabled:
-    st.markdown('<span class="ai-badge">● AI understanding enabled · GPT-5.6 Luna</span>', unsafe_allow_html=True)
-else:
-    st.markdown('<span class="ai-badge">○ Local fallback · no external AI call</span>', unsafe_allow_html=True)
+badge_col1, badge_col2, badge_col3 = st.columns([1.25, 1.15, 4])
+with badge_col1:
+    mode_label = "AI understanding" if AI_ENABLED else "Local understanding"
+    st.markdown(f'<span class="status-good">● {mode_label}</span>', unsafe_allow_html=True)
+with badge_col2:
+    st.markdown('<span class="status-safe">Human approval required</span>', unsafe_allow_html=True)
 
-col_a, col_b = st.columns([1, 2])
-with col_a:
+# Input
+st.markdown("### Founder request")
+input_col1, input_col2 = st.columns([1, 2.2])
+
+with input_col1:
     company = st.text_input("Company", value=default_company)
-with col_b:
-    request = st.text_area("How can Family Ventures help?", value=default_request, height=120)
 
-analyze = st.button("Analyze request", type="primary", use_container_width=True)
+with input_col2:
+    request = st.text_area(
+        "How can Family Ventures help?",
+        value=default_request,
+        height=120,
+        placeholder="Describe the founder's current priority, target market and desired outcome..."
+    )
 
-if analyze:
-    try:
-        with st.spinner("Understanding the founder need..."):
-            if ai_enabled:
-                analysis = llm_extract(request, api_key)
-                mode = "LLM"
-            else:
-                analysis = fallback_extract(request)
-                mode = "Fallback"
+if st.button("Analyze & activate network", type="primary", use_container_width=True):
+    with st.spinner("Understanding the need and mapping the network..."):
+        analysis, mode = safe_analyze(request)
+        ranked = rank_profiles(analysis)
 
-            ranked = rank_profiles(analysis)
+        st.session_state["analysis"] = analysis
+        st.session_state["ranked"] = ranked
+        st.session_state["request"] = request
+        st.session_state["company"] = company
+        st.session_state["analysis_mode"] = mode
+        st.session_state.pop("intro", None)
+        st.session_state.pop("intro_mode", None)
 
-            st.session_state["analysis"] = analysis
-            st.session_state["ranked"] = ranked
-            st.session_state["request"] = request
-            st.session_state["company"] = company
-            st.session_state["analysis_mode"] = mode
-            st.session_state.pop("intro", None)
-    except Exception as e:
-        st.error("AI analysis failed. Check the API key / API access, or remove the key to use fallback mode.")
-        st.caption(str(e))
-
+# Results
 if "analysis" in st.session_state:
     analysis = st.session_state["analysis"]
     ranked = st.session_state["ranked"]
+    mode = st.session_state.get("analysis_mode", "Local fallback")
 
     st.divider()
-    st.caption(f"Analysis mode: {st.session_state.get('analysis_mode', 'Unknown')}")
 
-    st.subheader("1. Need analysis")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Objective", analysis.get("objective", "—"))
-    c2.metric("Geography", ", ".join(analysis.get("countries", [])) or "Not specified")
-    c3.metric("Industry", ", ".join(analysis.get("industries", [])) or "Not specified")
+    if mode == "LLM":
+        st.caption("Understanding layer: LLM · Matching layer: deterministic scoring")
+    else:
+        st.warning(
+            "AI API unavailable or disabled — the prototype continued automatically using its local fallback."
+        )
+
+    # 1 Need analysis
+    st.markdown("## 1. Need analysis")
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Objective", analysis.get("objective", "—"))
+    m2.metric("Geography", ", ".join(analysis.get("countries", [])) or "Not specified")
+    m3.metric("Industry", ", ".join(analysis.get("industries", [])) or "Not specified")
 
     st.markdown("**Needs detected**")
-    st.write(" · ".join(analysis.get("needs", [])))
+    needs_html = "".join(
+        f'<span class="pill">{need}</span>' for need in analysis.get("needs", [])
+    )
+    st.markdown(needs_html or '<span class="muted">No explicit need detected</span>', unsafe_allow_html=True)
 
     if analysis.get("assumptions"):
         with st.expander("Assumptions / missing information"):
             for item in analysis["assumptions"]:
                 st.write("•", item)
 
-    st.subheader("2. Recommended support plan")
+    # 2 Support plan
+    st.markdown("## 2. Recommended support plan")
+
     for i, item in enumerate(analysis.get("support_plan", []), start=1):
-        st.write(f"**{i}.** {item}")
+        st.markdown(f"**{i}.** {item}")
 
     if analysis.get("success_metric"):
-        st.markdown("**Suggested success metric**")
-        st.write(analysis["success_metric"])
+        st.info("**Suggested success metric:** " + analysis["success_metric"])
 
-    st.subheader("3. Best network matches")
+    # 3 Matches
+    st.markdown("## 3. Best network matches")
+    st.caption("The LLM does not select the contacts. The ranking below is deterministic and explainable.")
+
     cols = st.columns(3)
-    for col, p in zip(cols, ranked):
+
+    for col, profile in zip(cols, ranked):
         with col:
-            st.markdown(f"### {p['name']}")
-            st.caption(p["role"])
-            st.metric("Match", f"{p['match_score']} / 100")
-            for reason in p["reasons"]:
+            st.markdown(f"### {profile['name']}")
+            st.caption(profile["role"])
+            st.markdown(f'<div class="score">{profile["match_score"]} / 100</div>', unsafe_allow_html=True)
+
+            st.progress(profile["match_score"] / 100)
+
+            for reason in profile["reasons"]:
                 st.write("✓", reason)
+
+            st.markdown("**Relevant capabilities**")
+            capabilities = profile.get("can_help_with", [])[:3]
+            if capabilities:
+                for capability in capabilities:
+                    st.caption("• " + capability)
+
             with st.expander("Why this score?"):
-                for label, pts in p["breakdown"].items():
-                    st.write(f"{label}: **{pts} pts**")
-                st.caption("Ranking is deterministic — the LLM does not choose the winner.")
+                for label, points in profile["breakdown"].items():
+                    st.write(f"{label}: **{points} pts**")
+                st.caption(
+                    "Score = geography (30) + industry (25) + expertise coverage (25) "
+                    "+ help type (15) + availability (5)."
+                )
 
-    st.subheader("4. Recommended next action")
-    st.info(recommended_action(analysis, ranked))
+    # 4 Action
+    st.markdown("## 4. Recommended next action")
+    st.success(recommended_action(analysis, ranked))
 
-    st.subheader("5. Draft introduction")
-    if st.button("Generate introduction"):
-        try:
-            with st.spinner("Drafting the introduction..."):
-                if ai_enabled:
-                    intro = llm_intro(
-                        st.session_state["company"],
-                        st.session_state["request"],
-                        ranked[0],
-                        api_key
-                    )
-                else:
-                    intro = deterministic_intro(
-                        st.session_state["company"],
-                        st.session_state["request"],
-                        ranked[0]
-                    )
-                st.session_state["intro"] = intro
-        except Exception as e:
-            st.error("Could not generate the AI draft. Falling back to the local template.")
-            st.session_state["intro"] = deterministic_intro(
+    st.markdown(
+        '<div class="human-box"><strong>Human-in-the-loop</strong><br>'
+        'The agent recommends who to involve and drafts the message. '
+        'A Family Ventures team member decides whether an introduction should actually be made.</div>',
+        unsafe_allow_html=True
+    )
+
+    # 5 Intro
+    st.markdown("## 5. Draft introduction")
+
+    top_profile = ranked[0]
+    st.caption(f"Drafting an introduction to {top_profile['name']} — final human validation required.")
+
+    if st.button("Generate introduction draft"):
+        with st.spinner("Drafting the introduction..."):
+            intro, intro_mode = safe_intro(
                 st.session_state["company"],
                 st.session_state["request"],
-                ranked[0]
+                top_profile,
             )
+            st.session_state["intro"] = intro
+            st.session_state["intro_mode"] = intro_mode
 
     if "intro" in st.session_state:
-        st.text_area("Draft — human validation required", st.session_state["intro"], height=240)
-        st.caption("The agent recommends and drafts. A Family Ventures team member validates before any outreach.")
+        st.text_area(
+            "Draft",
+            st.session_state["intro"],
+            height=230,
+        )
+        st.caption(f"Draft generation: {st.session_state.get('intro_mode', 'Local template')}")
 
+    # Method
     with st.expander("How the prototype works"):
         st.markdown("""
-**LLM layer**
-- Understands free-form founder requests
-- Converts them into structured needs
-- Suggests a support plan
-- Drafts the introduction
+**1 — Understanding layer**  
+A language model converts an unstructured founder request into objective, geography, industry, needs,
+a support plan and a measurable success metric.
 
-**Deterministic layer**
-- Scores network members using stored profile facts
-- Geography: 30 points
-- Industry: 25 points
-- Expertise: 25 points
-- Help type: 15 points
-- Availability: 5 points
+**2 — Explainable matching layer**  
+Network members are ranked with deterministic scoring based only on stored profile facts:
+geography, industry, expertise, type of help and availability.
 
-**Safeguard**
-- The LLM does not choose who gets contacted
-- The system does not send anything automatically
-- A human validates the final introduction
+**3 — Generation layer**  
+The model can draft an introduction using only the selected profile's stored facts.
+
+**4 — Human validation**  
+No message is sent automatically. A Family Ventures team member remains accountable for activating the network.
+
+**Resilience**  
+If the API is unavailable, the prototype automatically continues using a local rule-based fallback.
 """)
