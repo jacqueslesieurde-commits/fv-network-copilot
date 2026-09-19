@@ -613,74 +613,173 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-.block-container {
-    max-width: 1180px;
-    padding-top: 2.2rem;
-    padding-bottom: 5rem;
+:root {
+    --fv-bg: #f5f6f2;
+    --fv-surface: #ffffff;
+    --fv-text: #202722;
+    --fv-muted: #6c746e;
+    --fv-border: #e4e8e2;
+    --fv-accent: #21664f;
+    --fv-accent-soft: #edf5f0;
+    --fv-warm: #f3efe8;
 }
+
+.stApp { background: var(--fv-bg); color: var(--fv-text); }
+.block-container { max-width: 1120px; padding-top: 2.4rem; padding-bottom: 5rem; }
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 
+section[data-testid="stSidebar"] {
+    background: #eef1ec;
+    border-right: 1px solid var(--fv-border);
+}
+
 .kicker {
-    font-size: .76rem;
+    font-size: .72rem;
     font-weight: 700;
-    letter-spacing: .13em;
+    letter-spacing: .16em;
     text-transform: uppercase;
-    opacity: .65;
+    color: var(--fv-accent);
+    margin-bottom: .6rem;
 }
+
+.hero-wrap {
+    background: rgba(255,255,255,.95);
+    border: 1px solid var(--fv-border);
+    border-radius: 22px;
+    padding: 28px 30px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 28px rgba(31,38,34,.04);
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    line-height: 1.05;
+    font-weight: 760;
+    letter-spacing: -.03em;
+    margin-bottom: .6rem;
+}
+
 .hero-subtitle {
-    font-size: 1.03rem;
-    opacity: .72;
-    margin-top: -.5rem;
-    margin-bottom: 1.2rem;
+    font-size: 1.02rem;
+    color: var(--fv-muted);
+    max-width: 780px;
+    margin-bottom: 1rem;
 }
-.pill {
-    display: inline-block;
-    border: 1px solid rgba(128,128,128,.35);
+
+.flow { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+.flow-step {
+    background: var(--fv-warm);
+    border: 1px solid #e7dfd3;
     border-radius: 999px;
-    padding: 5px 10px;
-    margin: 0 5px 5px 0;
-    font-size: .82rem;
+    padding: 7px 10px;
+    font-size: .78rem;
+    color: #4b514c;
+}
+.flow-arrow { color:#9ba29d; font-size:.8rem; }
+
+.status-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+.status-good, .status-safe {
+    display:inline-block;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:.8rem;
 }
 .status-good {
-    display: inline-block;
-    border-radius: 999px;
-    padding: 5px 10px;
-    background: rgba(35, 134, 54, .12);
-    font-size: .82rem;
+    background:var(--fv-accent-soft);
+    color:var(--fv-accent);
+    border:1px solid #dbe9e1;
 }
 .status-safe {
-    display: inline-block;
-    border-radius: 999px;
-    padding: 5px 10px;
-    background: rgba(128, 128, 128, .12);
-    font-size: .82rem;
+    background:#f7f3ed;
+    color:#5b5750;
+    border:1px solid #e7dfd3;
 }
-.member-card {
-    border: 1px solid rgba(128,128,128,.22);
-    border-radius: 16px;
-    padding: 18px;
-    min-height: 360px;
+
+.section-eyebrow {
+    font-size:.73rem;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--fv-muted);
+    font-weight:700;
+    margin-bottom:.25rem;
 }
-.score {
-    font-size: 2rem;
-    font-weight: 750;
-    margin: .4rem 0 .2rem 0;
+
+.fv-card {
+    background:var(--fv-surface);
+    border:1px solid var(--fv-border);
+    border-radius:18px;
+    padding:17px;
+    box-shadow:0 6px 18px rgba(31,38,34,.03);
 }
-.muted {
-    opacity: .67;
-    font-size: .91rem;
+.metric-label { font-size:.77rem; color:var(--fv-muted); margin-bottom:7px; }
+.metric-value { font-size:1.27rem; line-height:1.18; font-weight:700; }
+
+.pill {
+    display:inline-block;
+    border:1px solid #dce2dc;
+    background:#fbfcfa;
+    border-radius:999px;
+    padding:6px 10px;
+    margin:0 6px 6px 0;
+    font-size:.79rem;
+    color:#424943;
 }
+
+.match-rank {
+    font-size:.7rem;
+    color:var(--fv-muted);
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    margin-bottom:5px;
+}
+.match-name { font-size:1.28rem; font-weight:740; margin-bottom:2px; }
+.match-role { font-size:.84rem; color:var(--fv-muted); min-height:40px; }
+.score { font-size:2.05rem; font-weight:760; margin:.6rem 0 .05rem 0; }
+.score-sub { color:var(--fv-muted); font-size:.75rem; margin-bottom:.55rem; }
+
 .human-box {
-    border: 1px solid rgba(128,128,128,.24);
-    border-radius: 14px;
-    padding: 13px 15px;
-    margin-top: .5rem;
+    border:1px solid var(--fv-border);
+    background:#fbfcfa;
+    border-radius:16px;
+    padding:15px 17px;
+    margin-top:.8rem;
 }
-div[data-testid="stMetric"] {
-    border: 1px solid rgba(128,128,128,.20);
-    padding: 14px;
-    border-radius: 14px;
+
+.next-action {
+    background:var(--fv-accent-soft);
+    border:1px solid #dbe9e1;
+    color:#245f4b;
+    border-radius:16px;
+    padding:16px 18px;
+    font-weight:600;
+}
+
+.muted { color:var(--fv-muted); font-size:.9rem; }
+
+div[data-testid="stTextInput"] input,
+div[data-testid="stTextArea"] textarea {
+    background:#fbfcfa !important;
+    border-radius:14px !important;
+    border:1px solid var(--fv-border) !important;
+}
+
+div.stButton > button {
+    border-radius:12px;
+    min-height:44px;
+    font-weight:650;
+}
+div.stButton > button[kind="primary"] {
+    background:var(--fv-accent);
+    border-color:var(--fv-accent);
+}
+div[data-testid="stExpander"] {
+    border-radius:14px;
+    border-color:var(--fv-border);
+    background:#fff;
+}
+div[data-testid="stProgress"] > div > div > div {
+    background-color:var(--fv-accent);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -688,7 +787,8 @@ div[data-testid="stMetric"] {
 # Sidebar
 with st.sidebar:
     st.markdown("### FV Network Copilot")
-    st.caption("Interview prototype · v3.2")
+    st.caption("Interview prototype · v4")
+    st.caption("Founder support × network activation")
 
     if AI_ENABLED:
         st.success("AI layer connected")
@@ -721,24 +821,40 @@ if selected != "Custom request":
     default_request = scenario["request"]
 
 # Hero
-st.markdown('<div class="kicker">Family Ventures · AI Agent Challenge</div>', unsafe_allow_html=True)
-st.title("FV Network Copilot")
+mode_label = "AI understanding" if AI_ENABLED else "Local understanding"
+
 st.markdown(
-    '<div class="hero-subtitle">'
-    'From a founder request to an actionable support plan and the right network activation.'
-    '</div>',
+    f"""
+    <div class="hero-wrap">
+        <div class="kicker">Family Ventures · AI Agent Challenge</div>
+        <div class="hero-title">FV Network Copilot</div>
+        <div class="hero-subtitle">
+            Turn an unstructured founder need into a concrete support plan,
+            the right network matches and a ready-to-review introduction.
+        </div>
+        <div class="flow">
+            <span class="flow-step">Founder need</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">AI understanding</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">Support plan</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">Network matching</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step">Human-approved action</span>
+        </div>
+        <div class="status-row">
+            <span class="status-good">● {mode_label}</span>
+            <span class="status-safe">Human approval required</span>
+        </div>
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
-badge_col1, badge_col2, badge_col3 = st.columns([1.25, 1.15, 4])
-with badge_col1:
-    mode_label = "AI understanding" if AI_ENABLED else "Local understanding"
-    st.markdown(f'<span class="status-good">● {mode_label}</span>', unsafe_allow_html=True)
-with badge_col2:
-    st.markdown('<span class="status-safe">Human approval required</span>', unsafe_allow_html=True)
-
 # Input
-st.markdown("### Founder request")
+st.markdown('<div class="section-eyebrow">Step 1</div>', unsafe_allow_html=True)
+st.markdown("## Founder request")
 input_col1, input_col2 = st.columns([1, 2.2])
 
 with input_col1:
@@ -781,7 +897,8 @@ if "analysis" in st.session_state:
         )
 
     # 1 Need analysis
-    st.markdown("## 1. Need analysis")
+    st.markdown('<div class="section-eyebrow">Step 2</div>', unsafe_allow_html=True)
+    st.markdown("## Need analysis")
 
     objective = analysis.get("objective", "—")
     geography = ", ".join(analysis.get("countries", [])) or "Not specified"
@@ -797,13 +914,9 @@ if "analysis" in st.session_state:
         with col:
             st.markdown(
                 f"""
-                <div style="
-                    border:1px solid rgba(128,128,128,.20);
-                    padding:14px 16px;
-                    border-radius:14px;
-                    min-height:112px;">
-                    <div style="font-size:.82rem; opacity:.68; margin-bottom:8px;">{label}</div>
-                    <div style="font-size:1.35rem; font-weight:650; line-height:1.18;">{value}</div>
+                <div class="fv-card" style="min-height:118px;">
+                    <div class="metric-label">{label}</div>
+                    <div class="metric-value">{value}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -821,7 +934,8 @@ if "analysis" in st.session_state:
                 st.write("•", item)
 
     # 2 Support plan
-    st.markdown("## 2. Recommended support plan")
+    st.markdown('<div class="section-eyebrow">Step 3</div>', unsafe_allow_html=True)
+    st.markdown("## Recommended support plan")
 
     for i, item in enumerate(analysis.get("support_plan", []), start=1):
         st.markdown(f"**{i}.** {item}")
@@ -830,16 +944,24 @@ if "analysis" in st.session_state:
         st.info("**Suggested success metric:** " + analysis["success_metric"])
 
     # 3 Matches
-    st.markdown("## 3. Best network matches")
+    st.markdown('<div class="section-eyebrow">Step 4</div>', unsafe_allow_html=True)
+    st.markdown("## Best network matches")
     st.caption("The LLM does not select the contacts. The ranking below is deterministic and explainable.")
 
     cols = st.columns(3)
 
-    for col, profile in zip(cols, ranked):
+    for rank, (col, profile) in enumerate(zip(cols, ranked), start=1):
         with col:
-            st.markdown(f"### {profile['name']}")
-            st.caption(profile["role"])
-            st.markdown(f'<div class="score">{profile["match_score"]} / 100</div>', unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class="match-rank">Match #{rank}</div>
+                <div class="match-name">{profile['name']}</div>
+                <div class="match-role">{profile['role']}</div>
+                <div class="score">{profile['match_score']} / 100</div>
+                <div class="score-sub">Explainable fit score</div>
+                """,
+                unsafe_allow_html=True,
+            )
 
             st.progress(profile["match_score"] / 100)
 
@@ -861,8 +983,13 @@ if "analysis" in st.session_state:
                 )
 
     # 4 Action
-    st.markdown("## 4. Recommended next action")
-    st.success(recommended_action(analysis, ranked))
+    st.markdown('<div class="section-eyebrow">Step 5</div>', unsafe_allow_html=True)
+    st.markdown("## Recommended next action")
+    action_text = recommended_action(analysis, ranked)
+    st.markdown(
+        f'<div class="next-action">{action_text}</div>',
+        unsafe_allow_html=True
+    )
 
     st.markdown(
         '<div class="human-box"><strong>Human-in-the-loop</strong><br>'
@@ -872,10 +999,11 @@ if "analysis" in st.session_state:
     )
 
     # 5 Intro
-    st.markdown("## 5. Draft introduction")
+    st.markdown('<div class="section-eyebrow">Step 6</div>', unsafe_allow_html=True)
+    st.markdown("## Draft introduction")
 
     top_profile = ranked[0]
-    st.caption(f"Drafting an introduction to {top_profile['name']} — final human validation required.")
+    st.caption(f"AI-assisted draft to {top_profile['name']}. Nothing is sent automatically.")
 
     if st.button("Generate introduction draft"):
         with st.spinner("Drafting the introduction..."):
